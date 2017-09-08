@@ -1,0 +1,316 @@
+﻿@model IEnumerable<Exchanger.Models.FileModel>
+
+@{
+    ViewBag.Title = "UserFiles";
+}
+
+<html>
+<head>
+    <title></title>
+    <link href='@Url.Content("~/Content/themes/base/jquery-ui.css")' rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+<h2>UserFiles</h2>
+
+    <p>
+        <a class="viewDialog btn btn-primary" data-dialog-title="Upload files" height="300" href="/File/Upload" width="550">
+            <i class="glyphicon glyphicon-upload"></i>
+            Upload files
+        </a>
+        <span class="btn btn-danger" id="deletefiles">
+            <i class="glyphicon glyphicon-trash"></i>
+            Delete
+        </span>
+    </p>
+
+<table class="table" id="table">
+    <tr>
+        <th>
+            <input type="checkbox" id="mainchbox">
+        </th>
+        <th onclick="sortTable(1)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.FileName)
+        </th>
+        <th onclick="sortTable(2)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.Size)
+        </th>
+        <th onclick="sortTable(3)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.CreationDate)
+        </th>
+        <th onclick="sortTable(4)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.LastEditDate)
+        </th>
+        <th onclick="sortTable(5)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.CreatedBy)
+        </th>
+        <th onclick="sortTable(6)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.Access)
+        </th>
+        <th onclick="sortTable(7)" style="cursor: pointer">
+            @Html.DisplayNameFor(model => model.FileType)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Where(item => item.CreatedBy == Session["Login"].ToString()))
+    {
+        <tr>
+            <td>
+                <input type="checkbox" name="foo" id="@item.Id">
+            </td>
+            <td style="word-wrap: break-word; max-width: 100px;">
+                @Html.ActionLink(item.FileName, "Download", new {id = item.Id})
+                @*@Html.DisplayFor(modelItem => item.FileName)*@
+    
+            </td>
+            <td>
+                @if (item.Size > 1024)
+                {
+                    item.Size /= 1024;
+                    if (item.Size > 1024)
+                    {
+                        item.Size /= 1024;
+                        @Html.DisplayFor(modelItem => item.Size)
+                        @Html.Encode(" MB")
+                    }
+                    @Html.DisplayFor(modelItem => item.Size)
+                    @Html.Encode(" KB")
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Size)
+                    @Html.Encode(" B")
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastEditDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Access)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FileType)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditFile", new {id = item.Id}, new {@class = "viewDialog btn btn-default", width = 420, height = 380, data_dialog_title = "Edit file"})
+                @Html.ActionLink("Delete", "DeleteFile", new {id = item.Id}, new {@class = "viewDialog btn btn-danger", width = 435, height = 420, data_dialog_title = "Delete file"})
+                @Html.ActionLink("Share", "ShareFile", new {id = item.Id}, new {@class = "viewDialog btn btn-default", width = 320, height = 180, data_dialog_title = "Share file"})
+            </td>
+        </tr>
+    }
+    <tr><th colspan="9">Shared files</th></tr>
+    @foreach (var item in Model.Where(item => item.CreatedBy != Session["Login"].ToString()))
+    {
+        <tr>
+            <td>
+                <input type="checkbox" name="foo" id="@item.Id">
+            </td>
+            <td style="word-wrap: break-word; max-width: 100px;">
+                @Html.ActionLink(item.FileName, "Download", new { id = item.Id })
+                @*@Html.DisplayFor(modelItem => item.FileName)*@
+
+            </td>
+            <td>
+                @if (item.Size > 1024)
+                {
+                    item.Size /= 1024;
+                    if (item.Size > 1024)
+                    {
+                        item.Size /= 1024;
+                        @Html.DisplayFor(modelItem => item.Size)
+                        @Html.Encode(" MB")
+                    }
+                    @Html.DisplayFor(modelItem => item.Size)
+                    @Html.Encode(" KB")
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.Size)
+                    @Html.Encode(" B")
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastEditDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Access)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FileType)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "EditFile", new { id = item.Id }, new { @class = "viewDialog btn btn-default", width = 420, height = 380, data_dialog_title = "Edit file" })
+                @Html.ActionLink("Delete", "DeleteFile", new { id = item.Id }, new { @class = "viewDialog btn btn-danger", width = 435, height = 420, data_dialog_title = "Delete file" })
+                @Html.ActionLink("Share", "ShareFile", new { id = item.Id }, new { @class = "viewDialog btn btn-default", width = 320, height = 180, data_dialog_title = "Share file" })
+            </td>
+        </tr>
+    }
+</table>
+
+<script src="~/Scripts/jquery-1.12.4.min.js"></script>
+<script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script>
+    jQuery.noConflict();
+    jQuery(document).ready(function($) {
+
+        $.ajaxSetup({ cache: false });
+
+        $(".viewDialog").on("click", function(e) {
+            e.preventDefault();
+            var width = $(this).attr("width");
+            var height = $(this).attr("height");
+
+            viewDialog(this.href, width, height, $(this).attr("data-dialog-title"));
+            jQuery(document).ready(function() {
+                $(".dialog").dialog('open');
+            });
+            centerDialog();
+        });
+
+        $("#mainchbox").on("click", function() {
+            var checkboxes = document.getElementsByName('foo');
+            if (this.checked) {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = true;
+                });
+            } else {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+            }
+        });
+
+        $(":checkbox").on("click", function() {
+            var checkboxes = document.getElementsByName('foo');
+            var allchecked = true;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked === false) {
+                    allchecked = false;
+                }
+            }
+            var mainchbox = document.getElementById('mainchbox');
+            mainchbox.checked = allchecked;
+        });
+
+        $("#deletefiles").on("click", function() {
+            var checkboxes = document.getElementsByName('foo');
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked === true) {
+                    $.ajax({
+                        type: 'POST',
+                        url: "@Url.Action("DeleteFile")",
+                        data: { id: checkboxes[i].id },
+                        async: false
+                    });
+                }
+            }
+            location.reload();
+        });
+
+        $(window).resize(function() {
+            centerDialog();
+        });
+
+        $(".dialog").dialog.CHANGE(function() {
+            centerDialog();
+        });
+
+        function centerDialog() {
+            $(".dialog").dialog("option", "position", { my: "center", at: "center", of: window });
+        };
+
+        function viewDialog(href, width, height, title) {
+            $("<div></div>")
+                .css("overflow", "hidden")
+                .addClass("dialog")
+                .appendTo("body")
+                .load(href)
+                .dialog({
+                    autoOpen: false,
+                    title: title,
+                    draggable: false,
+                    height: height,
+                    width: width,
+                    modal: true,
+                    resizable: "flase",
+                    close: function() {
+                        $(this).remove();
+                        location.reload();
+                    }
+                });
+        };
+    });
+</script>
+
+<script>
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("table");
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc";
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.getElementsByTagName("TR");
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1) ; i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                /*check if the two rows should switch place,
+                based on the direction, asc or desc:*/
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                //Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /*If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again.*/
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

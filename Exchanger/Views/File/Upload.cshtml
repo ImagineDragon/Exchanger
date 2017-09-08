@@ -1,0 +1,166 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "Upload";
+}
+<h3 style="margin-top: 5px; margin-bottom: 5px;">Select file to upload</h3>
+<div>
+    <script src="~/scripts/jquery-1.12.4.min.js"></script>
+
+    <div class="form-group" style="margin-bottom: 5px;">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div>
+            <div style="height: 150px; overflow-y: scroll; border: 1px solid #dddddd; border-collapse: collapse; background-color: #f2f2f2">
+                <table id="UploadTable" class="table table-condensed" style="margin-bottom: 0;">
+                    <tbody>
+                        <tr><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <br/>
+            <span class="btn btn-success" style="position: relative; overflow: hidden; display: inline-block;">
+                <i class="glyphicon glyphicon-plus"></i>
+                <span>Add files...</span>
+                <input type="file" style="position: absolute; top: 0; right: 0; margin: 0; opacity: 0; font-size: 200px !important; direction: ltr; cursor: pointer" id="fileInput" multiple />
+            </span>
+            <button type="submit" id="upload" class="btn btn-primary">
+                <i class="glyphicon glyphicon-upload"></i>
+                <span>Start upload</span>
+            </button>
+            @*@Html.ActionLink("Back to list", "UserFiles")*@
+        </div>
+    </div>
+</div>
+
+<script>
+    var files; //----------------------------------------- how to make it null without "Location.reload()" ???
+    $('input[type="file"]').change(function (e) {
+        var oldfiles = files;
+        var newfiles = e.target.files;
+        var combinedfiles = [];
+        var remove;
+        if (oldfiles == null) {
+            combinedfiles[0] = newfiles[0];
+            files = combinedfiles;
+        } else {
+            for (var i = 0; i < oldfiles.length; i++) {
+                combinedfiles[i] = oldfiles[i];
+            }
+            for (var i = 0; i < newfiles.length; i++) {
+                remove = false;
+                for (var j = 0; j < oldfiles.length; j++) {
+                    if (newfiles[i].name === combinedfiles[j].name) {
+                        remove = true;
+                    }
+                }
+                if (!remove) {
+                    combinedfiles[combinedfiles.length] = newfiles[i];
+                }
+            }
+            files = combinedfiles;
+        }
+        filltable();
+        var $el = $('#fileInput');
+        $el.wrap('<form>').closest('form').get(0).reset();
+        $el.unwrap();
+    });
+
+    function filltable() {
+        $('#UploadTable tr').remove();
+        var html = '';
+        var size = '';
+        var namestyle = '';
+        var sizeconst = 1024;
+        for (var i = 0; i < files.length; i++) {
+            size = files[i].size;
+            if (size > sizeconst) {
+                size = (files[i].size / sizeconst).toFixed(1);
+                if (size > sizeconst) {
+                    size = (size / sizeconst).toFixed(1) + ' MB';
+                } else size += ' KB';
+            } else size += ' B';
+
+            $.ajax({
+                url: "/File/CheckFileExist/",
+                type: 'POST',
+                async: false,
+                data: { name: files[i].name },
+                success: function(data) {
+                    if (data === "Success") {
+                        namestyle = 'color: red;';
+                    } else {
+                        namestyle = '';
+                    }
+                }
+            }).done(function() {
+                html += '<tr><td style="' + namestyle + ' overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;" ' +
+                    'onmouseover="showtextoverflow(this)" onmouseout="hidetextoverflow(this)">' + files[i].name +
+                    '</td><td style="text-align: right; width: 95px;">' + size +
+                    '<i class="btn glyphicon glyphicon-remove" id=' + files[i].name +
+                    ' style="padding: 0; margin-left: 10px; vertical-align: top;" onclick="removeelement(id)"></i></td></tr>';
+            });
+            //html += '<tr><td style="' + namestyle + ' overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 400px;" ' +
+            //        'onmouseover="showtextoverflow(this)" onmouseout="hidetextoverflow(this)">' + files[i].name +
+            //        '</td><td style="text-align: right; width: 95px;">' + size +
+            //        '<i class="btn glyphicon glyphicon-remove" id=' + files[i].name +
+            //        ' style="padding: 0; margin-left: 10px; vertical-align: top;" onclick="removeelement(id)"></i></td></tr>';
+        }
+        $('#UploadTable tbody').append(html);
+    };
+    
+    $(document).ready(function() {
+        $("#upload").click(function() {
+            var data = new FormData();
+
+            //Add the Multiple selected files into the data object
+            for (var i = 0; i < files.length; i++) {
+                data.append("files" + i, files[i]);
+            }
+
+            //Post the data (files) to the server
+            if (files.length > 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: "@Url.Action("Upload")",
+                    data: data,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    alert("Successfully Uploaded!");
+                },
+                error: function() {
+                    alert("An error occurred!");
+                }
+            }).done(function () {
+                location.reload();
+            });
+        }
+        });
+    });
+
+    function removeelement (name) {
+        var oldfiles = files;
+        var newfiles = [];
+        files = null;
+        for (var i = 0, j = 0; i < oldfiles.length; i++) {
+            if (oldfiles[i].name !== name) {
+                newfiles[j] = oldfiles[i];
+                j++;
+            }
+        }
+        files = newfiles;
+        filltable();
+    };
+
+    function showtextoverflow(text) {
+        text.style.textoverflow = "inherit";
+        text.style.overflow = "inherit";
+        text.style.whiteSpace = "inherit";
+        text.style.wordWrap = "break-word";
+    };
+
+    function hidetextoverflow(text) {
+        text.style.textoverflow = "ellipsis";
+        text.style.overflow = "hidden";
+        text.style.whiteSpace = "nowrap";
+    };
+</script>

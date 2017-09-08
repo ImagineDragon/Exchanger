@@ -1,0 +1,183 @@
+﻿@model IEnumerable<Exchanger.Models.DisplayUserModel>
+
+@{
+    ViewBag.Title = "AdminPage";
+}
+
+
+<head>
+    <title></title>
+    <link href='@Url.Content("~/Content/themes/base/jquery-ui.css")' rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <h2>AdminPage</h2>
+
+    <table class="table" id="table">
+        <tr>
+            <th onclick="sortTable(0)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th onclick="sortTable(1)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th onclick="sortTable(2)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.ParentName)
+            </th>
+            <th onclick="sortTable(3)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.Login)
+            </th>
+            <th onclick="sortTable(4)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.UserType)
+            </th>
+            <th onclick="sortTable(5)" style="cursor: pointer">
+                @Html.DisplayNameFor(model => model.Files)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ParentName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Login)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Files)
+                </td>
+                <td>
+                    @if (Session["Id"].ToString() != item.Id.ToString())
+                    {
+                        @Html.ActionLink("Edit", "EditUser", new { id = item.Id }, new { @class = "viewDialog", width = 400, height = 490, data_dialog_title = "Edit user" }) 
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Edit", "EditUser", new { id = item.Id }, new { @class = "viewDialog", width = 400, height = 530, data_dialog_title = "Edit user" })
+                    }
+                    |
+                    @Html.ActionLink("Detete", "DeleteUser", "Manage", new {id = item.Id}, new {@class = "viewDialog", width = 300, height = 420, data_dialog_title = "Delete user"})
+                </td>
+            </tr>
+        }
+    </table>
+
+    <script src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+<script>
+    jQuery.noConflict();
+    jQuery(document).ready(function($) {
+
+        $.ajaxSetup({ cache: false });
+        $(".viewDialog").on("click", function(e) {
+            e.preventDefault();
+            var width = $(this).attr("width");
+            var height = $(this).attr("height");
+
+            viewDialog(this.href, width, height, $(this).attr("data-dialog-title"));
+            jQuery(document).ready(function() {
+                $(".dialog").dialog('open');
+            });
+            centerDialog();
+        });
+
+        $(window).resize(function() {
+            centerDialog();
+        });
+
+        function centerDialog() {
+            $(".dialog").dialog("option", "position", { my: "center", at: "center", of: window });
+        };
+
+        function viewDialog(href, width, height, title) {
+            $("<div></div>")
+                .css("overflow", "hidden")
+                .addClass("dialog")
+                .appendTo("body")
+                .load(href)
+                .dialog({
+                    autoOpen: false,
+                    title: title,
+                    draggable: false,
+                    height: height,
+                    width: width,
+                    modal: true,
+                    resizable: "flase",
+                    close: function() {
+                        $(this).remove();
+                        location.reload();
+                    }
+                });
+        };
+    });
+</script>
+
+<script>
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("table");
+        switching = true;
+        //Set the sorting direction to ascending:
+        dir = "asc";
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+            //start by saying: no switching is done:
+            switching = false;
+            rows = table.getElementsByTagName("TR");
+            /*Loop through all table rows (except the
+            first, which contains table headers):*/
+            for (i = 1; i < (rows.length - 1); i++) {
+                //start by saying there should be no switching:
+                shouldSwitch = false;
+                /*Get the two elements you want to compare,
+                one from current row and one from the next:*/
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                /*check if the two rows should switch place,
+                based on the direction, asc or desc:*/
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        //if so, mark as a switch and break the loop:
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                /*If a switch has been marked, make the switch
+                and mark that a switch has been done:*/
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                //Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /*If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again.*/
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+</script>
+
+</body>

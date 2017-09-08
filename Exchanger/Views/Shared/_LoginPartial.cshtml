@@ -1,0 +1,31 @@
+﻿@if (Session["Login"] != null)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Hello @Session["Login"]!<b class="caret"></b></a>
+                @*@Html.ActionLink("Hello " + Session["Login"] + "!", "HomePage", "Home", routeValues: null, htmlAttributes: new {title = "Manage"})*@
+                <ul class="dropdown-menu">
+                    <li>@Html.ActionLink("Home page", "HomePage", "Home")</li>
+                    <li>@Html.ActionLink("My files", "UserFiles", "File")</li>
+                    @if (Session["UserTypeId"].ToString() == "2")
+                    {
+                        <li>@Html.ActionLink("Admin page", "AdminPage", "Manage")</li>
+                    }
+                    <li><hr style="margin-top: 5px; margin-bottom: 5px; width: 80%;"/></li>
+                    <li><a href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+                </ul>
+            </li>
+        </ul>
+    }
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>@Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })</li>
+        <li>@Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" })</li>
+    </ul>
+}

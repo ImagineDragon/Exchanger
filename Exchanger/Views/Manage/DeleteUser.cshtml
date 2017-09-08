@@ -1,0 +1,90 @@
+﻿@model Exchanger.Models.ShowEditUserModel
+@{
+    ViewBag.Title = "DeleteUser";
+}
+
+<style>
+    .control-label {
+        padding-top: 0;
+    }
+</style>
+
+<div class="form-horizontal" style="margin-top: 5px;">
+    <div class="form-group">
+        @Html.LabelFor(model => model.FirstName, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.FirstName)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.LastName, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.LastName)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ParentName, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.ParentName)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Address, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.Address)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Phone, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.Phone)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Email, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.Email)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Website, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.Website)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Files, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+        <div class="col-md-7">
+            @Html.Encode(Model.Files)
+        </div>
+    </div>
+
+    @if (Session["UserTypeId"].ToString() == "2")
+    {
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserType, htmlAttributes: new {@class = "col-md-5 control-label", style = "padding-top: 0;" })
+            <div class="col-md-7">
+                @Html.Encode(Model.UserType)
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("DeleteUser", "Manage", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
+    {
+        <div class="form-group">
+            <div class="text-center">
+                <input type="submit" class="btn btn-default" value="Delete" />
+                @Html.ActionLink("Cancel", "AdminPage", "Manage")
+                @*@(Session["Id"].ToString() != Model.Id.ToString() ?
+            Html.ActionLink("Cancel", "AdminPage", "Manage") : Html.ActionLink("Cancel", "HomePage", "Home"))*@
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,89 @@
+﻿@model Exchanger.Models.FileModel
+
+@{
+    Layout = null;
+    ViewBag.Title = "DeleteFile";
+}
+
+<h3 style="margin-top: 10px;">Are you sure you want to delete this?</h3>
+<hr/>
+<div class="form-horizontal">
+    <div class="form-group">
+        @Html.LabelFor(model => model.FileName, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;"})
+        <div class="col-md-8">
+            @Html.Encode(Model.FileName)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Size, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @if (Model.Size > 1024)
+            {
+                if (Model.Size > (1024*1024))
+                {
+                    @Html.Encode(Model.Size/1024/1024)
+                    <span> MB</span>
+                }
+                else
+                {
+                    @Html.Encode(Model.Size/1024)
+                    <span> KB</span>
+                }
+            }
+            else
+            {
+
+                @Html.Encode(Model.Size)
+                <span>B</span>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CreationDate, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @Html.Encode(Model.CreationDate)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.LastEditDate, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @Html.Encode(Model.LastEditDate)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.CreatedBy, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @Html.Encode(Model.CreatedBy)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Access, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @Html.Encode(Model.Access)
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.FileType, htmlAttributes: new {@class = "col-md-4 control-label", style = "padding-top: 0;" })
+        <div class="col-md-8">
+            @Html.Encode(Model.FileType)
+        </div>
+    </div>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="text-center">
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Delete" class="btn btn-default" /> |
+                    @Html.ActionLink("Back", "UserFiles")
+                </div>
+            </div>
+        </div>
+    }
+</div>

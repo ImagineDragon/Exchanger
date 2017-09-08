@@ -1,0 +1,115 @@
+﻿@model Exchanger.Models.EditUserModel
+@{
+    ViewBag.Title = "HomePage";
+}
+
+<head>
+    <title></title>
+    <link href='@Url.Content("~/Content/themes/base/jquery-ui.css")' rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <h2>HomePage</h2>
+
+    <div>
+        <h4>Your account settings</h4>
+        <hr />
+        <p>
+            First Name:
+            @Html.Encode(Model.FirstName)
+        </p>
+        <p>
+            Last Name:
+            @Html.Encode(Model.LastName)
+        </p>
+        <p>
+            Parent Name:
+            @Html.Encode(Model.ParentName)
+        </p>
+        <p>
+            Address:
+            @Html.Encode(Model.Address)
+        </p>
+        <p>
+            Phone:
+            @Html.Encode(Model.Phone)
+        </p>
+        <p>
+            Email:
+            @Html.Encode(Model.Email)
+        </p>
+        <p>
+            Website:
+            @Html.Encode(Model.Website)
+        </p>
+        <p>
+            Files:
+            @Html.Encode(Model.Files)
+        </p>
+        <p>
+            @if (Session["UserTypeId"].ToString() == "2")
+            {
+                @Html.ActionLink("Edit", "EditUser", "Manage", new {id = Session["Id"]}, new {@class = "viewDialog", width = 400, height = 530, data_dialog_title = "Edit user"})
+                <span>|</span>
+                @Html.ActionLink("Delete", "DeleteUser", "Manage", new {id = Session["Id"]}, new {@class = "viewDialog", width = 300, height = 420, data_dialog_title = "Delete user"})
+            }
+            else
+            {
+                @Html.ActionLink("Edit", "EditUser", "Manage", new { id = Session["Id"] }, new { @class = "viewDialog", width = 400, height = 490, data_dialog_title = "Edit user" })
+                <span>|</span>
+                @Html.ActionLink("Delete", "DeleteUser", "Manage", new { id = Session["Id"] }, new { @class = "viewDialog", width = 300, height = 380, data_dialog_title = "Delete user" })
+            }
+        </p>
+    </div>
+
+    <script src="~/Scripts/jquery-1.12.4.min.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        jQuery.noConflict();
+        jQuery(document).ready(function ($) {
+
+            $.ajaxSetup({ cache: false });
+            $(".viewDialog").on("click", function (e) {
+                e.preventDefault();
+                var width = $(this).attr("width");
+                var height = $(this).attr("height");
+
+                viewDialog(this.href, width, height, $(this).attr("data-dialog-title"));
+                jQuery(document).ready(function () {
+                    $(".dialog").dialog('open');
+                });
+                centerDialog();
+            });
+
+            $(window).resize(function () {
+                centerDialog();
+            });
+
+            function centerDialog() {
+                $(".dialog").dialog("option", "position", { my: "center", at: "center", of: window });
+            };
+
+            function viewDialog(href, width, height, title) {
+                $("<div></div>")
+                    .css("overflow", "hidden")
+                    .addClass("dialog")
+                    .appendTo("body")
+                    .load(href)
+                    .dialog({
+                        autoOpen: false,
+                        title: title,
+                        draggable: false,
+                        height: height,
+                        width: width,
+                        modal: true,
+                        resizable: "flase",
+                        close: function () {
+                            $(this).remove();
+                            location.reload();
+                        }
+                    });
+            };
+        });
+    </script>
+
+</body>
